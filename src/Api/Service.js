@@ -2,17 +2,7 @@ import axios from 'axios';
 export default class Service {
 
 
-   static async getAll (url, limit = 20, offset = 0) {
 
-      const response = await axios.get(url, {
-         params: {
-            limit: limit,
-            offset: offset,
-         }
-      })
-      return response
-
-   }
    static async getAlls (url, limit = 1280) {
 
       const response = await axios.get(url, {
@@ -41,5 +31,13 @@ export default class Service {
                resolve(data);
             })
       })
+   }
+   static async getTypes () {
+      const response = await axios.get('https://pokeapi.co/api/v2/type/')
+      return response
+   }
+   static async getTypesByName (name) {
+      const response = await axios.get('https://pokeapi.co/api/v2/type/' + name)
+      return response
    }
 }

@@ -1,37 +1,29 @@
 import React, { useEffect, useState, useMemo } from "react";
-import Service from "../Api/Service";
-import PokemonList from "./PokemenList";
 import Pagination from './pagination/Pagination';
-import Loader from "./Loader";
-import ReactPaginate from 'react-paginate';
 import { Link } from 'react-router-dom';
+import { PokemonList, Loader } from "./index"
+import Service from "../api/Service"
+import Funcs from "../utils/functions";
 
 function Pokemons () {
-   const [pokemons, setPokemons] = useState([])
    const [pokemonAll, setPokemonAll] = useState([])
-   const [totalpages, setTotalPages] = useState('3')
+   const [pokTypes, setPokTypes] = useState([])
+   const [totalpages, setTotalPages] = useState('1')
    const [limit, setLimit] = useState(20)
    const [loading, setLoading] = React.useState(true)
    const [loading2, setLoading2] = React.useState(false)
 
-   const [offset, setOffset] = useState(0)
-   // const [page, setPage] = useState(1)
    const [selectedSort, setSelectedSort] = React.useState('')
    const [selectedType, setSelectedType] = React.useState('')
    const [searchPok, setSarchPok] = React.useState('')
-   const [nextUrl, setNextUrl] = React.useState('')
-   const [prevUrl, setPrevUrl] = React.useState('')
    const url = 'https://pokeapi.co/api/v2/pokemon'
 
-   // let PageSize = totalpages;
-
    const [currentPage, setCurrentPage] = useState(1);
+   const lastPageIndex = currentPage * limit
+   const firstPageIndex = lastPageIndex - limit
+   const curr = pokemonAll.slice(firstPageIndex, lastPageIndex)
+   const paginate = pageNum => setCurrentPage(pageNum)
 
-   // const currentTableData = useMemo(() => {
-   //    const firstPageIndex = (currentPage - 1) * PageSize;
-   //    const lastPageIndex = firstPageIndex + PageSize;
-   //    return pokemonAll.slice(firstPageIndex, lastPageIndex);
-   // }, [currentPage]);
    const fetchAllData = useMemo(() => {
       return async function () {
          let response = await Service.getAlls(url)
@@ -40,63 +32,32 @@ function Pokemons () {
 
       }
    }, [])
-   useEffect(() => {
-      async function fetch () {
-         let response = await Service.getAll(url, limit, offset)
-         setNextUrl(response.data.next)
-         setPrevUrl(response.data.previous)
-         await loadingPock(response.data.results)
+
+   const fetchTypes = useMemo(() => {
+      return async function () {
+         let response = await Service.getTypes()
+         setPokTypes(response.data.results)
 
       }
-      fetch()
+   }, [])
 
-      // async function fetchAll () {
-      //    let response = await Service.getAlls(url)
-      //    await loadingPockAll(response.data.results)
-      //    setTotalPages(response.data.count)
+   async function fetchTypesByName (name) {
+      let response = await Service.getTypesByName(name)
+      await loadingPockAllByType(response.data.pokemon)
 
-      // }
-      // fetchAll()
+   }
+
+   useEffect(() => {
+
       fetchAllData();
+      // typedPoks()
+      fetchTypes();
       setLoading(false)
+   }, [])
 
-   }, [limit, offset, searchPok])
-
-
-
-   async function nextPage () {
-      setLoading2(true)
-      let data = await Service.getAll(nextUrl)
-      await loadingPock(data.data.results)
-      setNextUrl(data.data.next)
-      setPrevUrl(data.data.previous)
-      setLoading2(false)
-
-   }
-
-
-   async function prevPage () {
-      setLoading2(true)
-
-      if (!prevUrl) return
-      let data = await Service.getAll(prevUrl)
-      await loadingPock(data.data.results)
-      setNextUrl(data.data.next)
-      setPrevUrl(data.data.previous)
-      setLoading2(false)
-
-   }
-
-   async function loadingPock (data) {
-      let _data = await Promise.all(
-         data.map(async pok => {
-            let record = await Service.getPoc(pok.url);
-            return record
-         })
-      )
-      setPokemons(_data)
-   }
    async function loadingPockAll (data) {
+      setLoading2(true)
+
       let _data = await Promise.all(
          data.map(async pok => {
             let record = await Service.getPoc(pok.url);
@@ -104,45 +65,61 @@ function Pokemons () {
          })
       )
       setPokemonAll(_data)
+      setLoading2(false)
+
    }
 
-   function typePoks (type) {
-      setSelectedType(type)
-      setPokemons([...pokemons].filter(ty => {
-         return ty.types?.type?.name.includes(selectedSort)
-      }
-      ))
-      // setPokemons([...pokemonAll].filter(pok => pok.types.filter(ty => ty.type.name.includes(selectedSort))))
+   async function loadingPockAllByType (data) {
+      if (!selectedType) return false
+      setLoading2(true)
+      let _data = await Promise.all(
+         data.map(async pok => {
+            let record = await Service.getPoc(pok.pokemon.url);
+            return record
+         })
+      )
+      setPokemonAll(_data)
+      setLoading2(false)
+
    }
+
+   const typedPoks = useMemo(() => {
+      if (selectedType === '*') {
+         fetchAllData()
+      } else {
+         fetchTypesByName(selectedType)
+      }
+   }, [selectedType])
 
 
    const sortedPoks = useMemo(() => {
       if (selectedSort) {
          if (selectedSort === '*') {
-            return pokemons
+            return curr
          } else if (selectedSort === 'name') {
-            return [...pokemonAll].sort((a, b) => a[selectedSort].localeCompare(b[selectedSort]))
+            const sortName = [...pokemonAll].sort((a, b) => a[selectedSort].localeCompare(b[selectedSort]))
+            return sortName.slice(firstPageIndex, lastPageIndex)
          }
          else if (selectedSort === 'name-2') {
-            return [...pokemonAll].sort((a, b) => b['name'].localeCompare(a['name']))
+            const sortName2 = [...pokemonAll].sort((a, b) => b['name'].localeCompare(a['name']))
+            return sortName2.slice(firstPageIndex, lastPageIndex)
+
          }
-         return pokemons
+         return curr
       }
-      return pokemons
 
+      return curr
 
-   }, [selectedSort, pokemonAll])
-
-   const selectedAndSearchedPoks = useMemo(() => {
-      return sortedPoks.filter(pok => pok.name.toLocaleLowerCase().includes(searchPok.toLocaleLowerCase()))
-
-   }, [searchPok, sortedPoks])
+   }, [selectedSort, pokemonAll, firstPageIndex, lastPageIndex])
 
    function searchPoks () {
-      setPokemons([...pokemonAll].filter(pok => pok.name.toLocaleLowerCase().includes(searchPok.toLocaleLowerCase())))
+      if (searchPok === "") return pokemonAll
+      setLoading2(true)
+      const searchh = [...pokemonAll].filter(pok => pok.name.toLocaleLowerCase().includes(searchPok.toLocaleLowerCase()))
+      setPokemonAll(searchh)
+      setLoading2(false)
 
    }
-
 
 
    return (
@@ -164,12 +141,12 @@ function Pokemons () {
                               />
                               <button className="search-all" onClick={searchPoks}>Search All</button>
                               <select className="home-select types"
-                                 onChange={e => typePoks(e.target.value)} value={selectedType}
+                                 onChange={e => setSelectedType(e.target.value)} value={selectedType}
                               >
-                                 <option >All types</option>
-                                 <option value={'normal'}  >Normal</option>
-                                 <option value={'rock'} >Rock</option>
-                                 <option value={'bug'} >Bug</option>
+                                 <option defaultValue value='*'  >All types</option>
+                                 {pokTypes.map(type => {
+                                    return <option value={type.name}>{Funcs.nameFirstChild(type.name)}</option>
+                                 })}
                               </select>
                               <select className="home-select sort" onChange={e => setSelectedSort(e.target.value)} value={selectedSort}>
                                  <option defaultChecked value={'*'} >Sort by</option>
@@ -190,34 +167,17 @@ function Pokemons () {
                      {loading2
 
                         ? <Loader />
-                        : <PokemonList list={selectedAndSearchedPoks} loading={loading} />
-
+                        : <div>
+                           <PokemonList list={sortedPoks} loading={loading} />
+                           <Pagination limit={limit} totalPages={pokemonAll.length} paginate={paginate} currentPage={currentPage} />
+                        </div>
                      }
-                     <div className="home__buttons">
-                        <div className="home__button" onClick={prevPage}>Prev.</div>
-                        <div className="home__button" onClick={nextPage}>Next.</div>
-                     </div>
-                     {searchPok
-                        ? <div></div>
-                        : <Pagination
-                           className="pagination-bar"
-                           currentPage={currentPage}
-                           totalCount={totalpages}
-                           pageSize={limit}
-                           onPageChange={page => setCurrentPage(page)}
-                           next={nextPage}
-                           prev={prevPage}
-                           offset={setOffset}
-                           limit={limit}
-                        />
-                     }
-
 
                   </div >
                </div >
          }
-      </div>
+      </div >
    );
 }
 
-export default Pokemons;
+export default Pokemons; 

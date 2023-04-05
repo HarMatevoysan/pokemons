@@ -1,0 +1,77 @@
+.page__contenier {
+   margin: 0 auto;
+   max-width: 1180px;
+   padding: 16px;
+}
+
+
+.page {
+   margin-top: 50px;
+   position: relative;
+}
+
+.page__title{
+   FONT-WEIGHT: 700;
+   color: cadetblue;
+   text-align: center;
+   font-size: 50px;
+   font-style: inherit;
+}
+
+.page__body{
+   display: flex;
+   margin: 40px 0 0 0;
+}
+
+.page__avatar{
+   display: flex;
+   justify-content: center;
+   background: #f1f1f1;
+   border-radius: 10px;
+}
+
+.page__avatar img{
+   height: 400px;
+   padding: 20px;
+}
+
+.page__description{
+   font-size: 22px;
+}
+
+.page__info{
+   display: flex;
+   flex-wrap: wrap;
+}
+
+.page__info-item{
+   flex: 0 1 33.333%;
+   text-align: center;
+padding: 10px 55px;
+}
+
+.page__info-item-title{
+   color: cadetblue;
+   font-size: 20px;
+}
+
+.page__info-item-info{
+   margin-top: 5px;
+}
+
+.page__stats-title{
+   color: cadetblue;
+   font-weight: 700;
+   font-size: 22px;
+}
+.page__stats-cols{
+   display: flex;
+   flex-wrap: wrap;
+}
+.page__stats-col{
+   height: 100px;
+   width: 100px;
+   flex: 0 1 33.333%;
+   margin: 5px 0;
+
+}

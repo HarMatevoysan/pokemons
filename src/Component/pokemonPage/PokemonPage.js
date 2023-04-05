@@ -1,12 +1,14 @@
 import React, { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import Service from "../Api/Service";
-import Funcs from "./utils/functions";
+import Service from "../../api/Service";
+import Funcs from "../../utils/functions";
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import Loader from './Loader';
+import { Loader } from "../index";
+import "./pokemonPage.css"
 
-function PokemeonPage () {
+
+function PokemonPage () {
    const params = useParams();
    const [pokemon, setPokemon] = React.useState({});
    const [loading, setLoading] = React.useState(true);
@@ -48,7 +50,7 @@ function PokemeonPage () {
                   </div>
                   <div className="column" style={{ marginLeft: 50 }}>
                      <div className="page__description">
-                        {desc.flavor_text_entries[1].flavor_text.toString()}
+                        {desc?.flavor_text_entries[1]?.flavor_text?.toString()}
                      </div>
                      <div className="page__info">
                         <div className="page__info-item">
@@ -119,4 +121,4 @@ function PokemeonPage () {
    );
 }
 
-export default PokemeonPage;
+export default PokemonPage;

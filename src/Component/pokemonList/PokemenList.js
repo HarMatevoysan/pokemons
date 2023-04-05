@@ -1,13 +1,14 @@
 import React from "react";
-import PokemonCard from "./PokemonCard";
-import Loader from './Loader';
+// import PokemonCard from "../pokemonCard/PokemonCard";
+import { Loader, PokemonCard } from './../index'
+import style from './pokemonList.module.css'
 
 function PokemonList ({ list, loading }) {
    return (
       <div>
          {loading
             ? <Loader />
-            : <div className="pokemon-cards">
+            : <div className={style.pokemons}>
 
                {list.map(a => {
                   return <PokemonCard key={a.id} list={a} />

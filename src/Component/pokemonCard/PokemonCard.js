@@ -1,24 +1,10 @@
 import React from "react";
 import { useNavigate } from 'react-router-dom'
-import Funcs from "./utils/functions";
+import Funcs from '../../utils/functions';
+import "./pokemonCard.css"
 
 function PokemonCard ({ list }) {
    const loc = useNavigate();
-
-   // console.log(list.types.type);
-   // function nameFirstChild (str) {
-   //    return str.charAt(0).toUpperCase() + str.slice(1);
-   // }
-   // function addingZero (id) {
-   //    if (id < 10) {
-   //       return '#00' + id
-   //    } else if (id < 100) {
-   //       return '#0' + id
-   //    } else {
-   //       return '#' + id
-   //    }
-   // }
-
    return (
       <div className="pokemon-card card" onClick={() => loc(`/pokemons/${list.name}`)}>
          <div className="card__avatar">
