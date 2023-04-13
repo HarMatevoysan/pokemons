@@ -15,6 +15,7 @@ const PokemonPage = () => {
    const [loading, setLoading] = useState(true);
    const [desc, setDesc] = useState({});
    useEffect(() => {
+      document.title = 'Pokemon ' + Funcs.nameFirstChild(params.name)
       async function fetch () {
          const response = await Service.getByName(poksUrl, params.name);
          setPokemon(response.data);
