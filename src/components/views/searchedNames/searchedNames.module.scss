@@ -1,0 +1,17 @@
+.bar{
+position: absolute;
+width: 100%;
+top: 35px;
+box-shadow: 1px 3px 8px 0 rgba(0, 0, 0, 0.2);
+background: #fff;
+
+&__items{
+padding: 5px;
+
+   &:hover{
+      background-color: darkcyan;
+      color: #fff;
+      cursor: pointer;
+   }
+}
+}

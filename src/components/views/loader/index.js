@@ -1,7 +1,6 @@
-import style from './loader.module.css'
+import style from './loader.module.scss'
 
-function Loader () {
-
+const Loader = () => {
    return (
       <div className={style.content}>
          <div className={style.ellipsis}><div></div><div></div><div></div><div></div></div>

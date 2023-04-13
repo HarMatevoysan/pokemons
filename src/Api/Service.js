@@ -1,28 +1,17 @@
 import axios from 'axios';
 export default class Service {
-
-
-
    static async getAlls (url, limit = 1280) {
-
       const response = await axios.get(url, {
          params: {
             limit: limit,
-
          }
       })
       return response
-
    }
    static async getByName (url, name) {
-
       const response = await axios.get(url + '/' + name)
       return response
-
    }
-
-
-
    static async getPoc (url) {
       return new Promise((resolve, reject) => {
          fetch(url)
