@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from 'react-router-dom'
-import Funcs from './../../../utils/functions';
+import Funcs from '../../../utils';
 import style from "./pokemonCard.module.scss"
 
 const PokemonCard = ({ list }) => {

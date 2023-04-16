@@ -1,22 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import Service from './../../../api/Service';
-import Funcs from "./../../../utils/functions";
-import { CircularProgressbar } from 'react-circular-progressbar';
-import 'react-circular-progressbar/dist/styles.css';
 import { Loader } from "../../index";
+import Funcs from "../../../utils/index";
 import style from "./pokemonPage.module.scss"
-import { pokSpecsUrl, poksUrl } from "../../../constants";
+import { Link, useParams } from "react-router-dom";
+import Service from '../../../api/service/index';
+import 'react-circular-progressbar/dist/styles.css';
+import { pokSpecsUrl, poksUrl } from "../../../constants/index";
+import { CircularProgressbar } from 'react-circular-progressbar';
 
 
 const PokemonPage = () => {
    const params = useParams();
+   const [desc, setDesc] = useState({});
    const [pokemon, setPokemon] = useState({});
    const [loading, setLoading] = useState(true);
-   const [desc, setDesc] = useState({});
+
    useEffect(() => {
       document.title = 'Pokemon ' + Funcs.nameFirstChild(params.name)
-      async function fetch () {
+      const fetch = async () => {
          const response = await Service.getByName(poksUrl, params.name);
          setPokemon(response.data);
          const descriptions = await Service.getByName(pokSpecsUrl, params.name);

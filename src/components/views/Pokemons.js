@@ -1,34 +1,36 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import { Link } from 'react-router-dom';
-import { PokemonList, Loader, Pagination, MySelect, SearchedNames } from "./../index"
-import Service from "../../api/Service"
-import Funcs from "./../../utils/functions";
 import { poksUrl } from "../../constants";
+import Funcs from "../../utils/index";
+import { Service } from './../../api/index'
 import searchIcon from './../../assets/png/searchicon.png'
+import { PokemonList, Loader, Pagination, MySelect, SearchedNames } from "./../index"
 
 const Pokemons = () => {
-   const [pokemonAll, setPokemonAll] = useState([])
-   const [pokemonAlls, setPokemonAlls] = useState([])
-   const [pokemonNames, setPokemonNames] = useState([])
-   const [pokemonNamesFiltred, setPokemonNamesFiltred] = useState([])
-   const [showBar, setShowBar] = useState(false)
-   const [pokTypes, setPokTypes] = useState([])
+   const observer = useRef()
+   const lastElement = useRef()
    const [limit, setLimit] = useState(20)
    const [loading, setLoading] = useState(true)
+   const [pokTypes, setPokTypes] = useState([])
+   const [showBar, setShowBar] = useState(false)
+   const [searchPok, setSarchPok] = useState('')
    const [loading2, setLoading2] = useState(false)
+   const [pokemonAll, setPokemonAll] = useState([])
+   const [currentPage, setCurrentPage] = useState(1);
+   const [pokemonAlls, setPokemonAlls] = useState([])
+   const [pokemonNames, setPokemonNames] = useState([])
    const [selectedSort, setSelectedSort] = useState('')
    const [selectedType, setSelectedType] = useState('')
-   const [searchPok, setSarchPok] = useState('')
-   const [currentPage, setCurrentPage] = useState(1);
    const [minPageLimit, setMinPageLimit] = useState(0);
    const [maxPageLimit, setMaxPageLimit] = useState(7);
+   const [pokemonNamesFiltred, setPokemonNamesFiltred] = useState([])
+
+   const pokemonName = []
    const lastPageIndex = currentPage * limit
    const firstPageIndex = lastPageIndex - limit
-   const curr = pokemonAll.slice(firstPageIndex, lastPageIndex)
    const paginate = pageNum => setCurrentPage(pageNum)
-   const pokemonName = []
-   const lastElement = useRef()
-   const observer = useRef()
+   const curr = pokemonAll.slice(firstPageIndex, lastPageIndex)
+
    const fetchAllData = useMemo(() => {
       return async function () {
          const response = await Service.getAlls(poksUrl)
@@ -45,7 +47,7 @@ const Pokemons = () => {
       }
    }, [])
 
-   async function fetchTypesByName (name) {
+   const fetchTypesByName = async (name) => {
       const response = await Service.getTypesByName(name)
       await loadingPockAllByType(response.data.pokemon)
 
@@ -58,18 +60,16 @@ const Pokemons = () => {
 
    useEffect(() => {
       if (observer.current) observer.current.disconnect()
-      let callback = (entries, observer) => {
+      const callback = (entries, observer) => {
          if (entries[0].isIntersecting) {
             setLimit(limit + 20)
-
          }
-
       }
       observer.current = new IntersectionObserver(callback)
       observer.current.observe(lastElement.current)
    }, [limit])
 
-   async function loadingPockAll (data) {
+   const loadingPockAll = async (data) => {
       setLoading2(true)
       const _data = await Promise.all(
          data.map(async pok => {
@@ -84,7 +84,7 @@ const Pokemons = () => {
       setLoading2(false)
    }
 
-   async function loadingPockAllByType (data) {
+   const loadingPockAllByType = async (data) => {
       if (!selectedType) return false
       setLoading2(true)
       const _data = await Promise.all(
@@ -124,7 +124,7 @@ const Pokemons = () => {
       return curr
    }, [selectedSort, pokemonAll, firstPageIndex, lastPageIndex])
 
-   function searchPoks (e) {
+   const searchPoks = (e) => {
       e.preventDefault()
       if (searchPok.length > 0) {
          setSarchPok(e.target.innerText)
@@ -142,7 +142,7 @@ const Pokemons = () => {
 
    }
 
-   function setLimitt (e) {
+   const setLimitt = (e) => {
       setLimit(e)
       setCurrentPage(1)
       setMinPageLimit(0)
@@ -235,7 +235,7 @@ const Pokemons = () => {
                         {loading2
                            ? <Loader />
                            : <div>
-                              <PokemonList list={sortedPoks} loading={loading} />
+                              <PokemonList list={sortedPoks} loading={loading} reff={lastElement} />
                               <Pagination
                                  limit={limit}
                                  totalPages={pokemonAll.length}
